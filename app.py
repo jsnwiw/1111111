@@ -1,42 +1,42 @@
-import time  # 추가된 코드: Import -> import (소문자 수정)
-import matplotlib.pyplot as plt  # np에서 plt로 수정
+import time
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
 
-# 페이지 설정
-st.set_page_config(page_title="학생만족도 대시보드", layout="wide")
+# Page Configuration
+st.set_page_config(page_title="Student Satisfaction Dashboard", layout="wide")
 
 
-# --- CSS: 글래스모피즘 및 애니메이션 효과 ---
+# --- CSS: Glassmorphism and Animation Effects ---
 st.markdown(
     """
     <style>
-    /* 전체 배경 설정 */
+    /* Full Background */
     .stApp {
         background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
         background-attachment: fixed;
     }
 
-    /* 애니메이션 정의 */
+    /* Animation Definition */
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 사이드바 글래스 스타일 */
+    /* Sidebar Glass Style */
     section[data-testid="stSidebar"] {
         background: rgba(255, 255, 255, 0.2) !important;
         backdrop-filter: blur(15px);
         border-right: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    /* 메인 카드 스타일 (글래스모피즘) */
+    /* Main Card Style (Glassmorphism) */
     .stMetric, .stDataFrame, .stAlert, div.stButton > button {
         animation: fadeInUp 0.8s ease-out;
     }
 
-    /* 버튼 스타일 커스텀 */
+    /* Custom Button Style */
     div.stButton > button {
         background: rgba(255, 255, 255, 0.3);
         color: #1c1c1c;
@@ -54,20 +54,20 @@ st.markdown(
         border: 1px solid #ffffff;
     }
 
-    /* 입력창 및 슬라이더 스타일 */
+    /* Input & Slider Style */
     .stTextInput input, .stSlider {
         background: rgba(255, 255, 255, 0.2);
         border-radius: 10px;
     }
     
-    /* 타이틀 애니메이션 및 폰트 */
+    /* Title Animation and Typography */
     h1 {
         color: #2c3e50;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         animation: fadeInUp 0.5s ease-out;
     }
     
-    /* 결과 박스 글래스 효과 */
+    /* Alert Box Glass Effect */
     .element-container div.stAlert {
         background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(10px);
@@ -77,80 +77,79 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True,
-)  # 추가된 코드: CSS 오타(h1 {~) 수정 및 파이썬 문법 정리
+)
 
 
-# 메인 타이틀
-st.title("✨ 학생만족도 대시보드")
-st.markdown("##### 학생만족도 실시중입니다. 아래의 데이터를 확인해 주세요.")
+# Main Title
+st.title("✨ Student Satisfaction Dashboard")
+st.markdown("##### The student satisfaction survey is currently active. Please review the data below.")
 
 
-# 세션 상태 초기화
+# Initialize Session State
 if "responses" not in st.session_state:
     st.session_state.responses = []
 
 
-# 사이드바 입력창
-st.sidebar.header("📝 입력 섹션")
+# Sidebar Input Section
+st.sidebar.header("📝 Input Section")
 student_name = st.sidebar.text_input(
-    "학생 이름 입력", value="", placeholder="이름을 입력하세요"
+    "Student Name", value="", placeholder="Enter name"
 )
 st.sidebar.markdown("---")
-st.sidebar.header("📊 만족도")
+st.sidebar.header("📊 Satisfaction")
 score = st.sidebar.slider(
-    "만족도 점수", min_value=0, max_value=100, value=50, step=1
+    "Satisfaction Score", min_value=0, max_value=100, value=50, step=1
 )
-student_제출 = st.sidebar.button("🚀 데이터 제출하기")
-view_button = st.sidebar.button("📂 저장된 답변 보기")
+submit_button = st.sidebar.button("🚀 Submit Data")
+view_button = st.sidebar.button("📂 View Saved Responses")
 
 
 col1, col2 = st.columns([1, 1])
 
 
-if student_제출:
-    with st.spinner("데이터를 안전하게 처리 중입니다..."):
+if submit_button:
+    with st.spinner("Processing data securely..."):
         progress_bar = st.progress(0)
         for progress in range(1, 101):
-            time.sleep(0.01)  # 조금 더 빠르게 조절
+            time.sleep(0.01)
             progress_bar.progress(progress)
 
-    # 데이터 보정 및 저장
+    # Data validation and storage
     raw_scores = [score]
     clipped_scores = np.clip(raw_scores, 0, 100)
     final_score = int(clipped_scores[0])
-    name_to_save = student_name.strip() or "익명 학생"
+    name_to_save = student_name.strip() or "Anonymous Student"
 
     st.session_state.responses.append({
-        "학생 이름": name_to_save,
-        "만족도 점수": final_score,
-        "시간": time.strftime("%H:%M:%S"),
+        "Student Name": name_to_save,
+        "Satisfaction Score": final_score,
+        "Timestamp": time.strftime("%H:%M:%S"),
     })
 
     with col1:
-        st.markdown("### 처리 결과")
+        st.markdown("### Result")
         if final_score >= 80:
-            st.success(f"🌟 **아주 만족!** ({final_score}점)")
+            st.success(f"🌟 **Highly Satisfied!** ({final_score} pts)")
         elif final_score >= 50:
-            st.info(f"😊 **보통 이상!** ({final_score}점)")
+            st.info(f"😊 **Satisfied / Above Average!** ({final_score} pts)")
         else:
-            st.warning(f"⚠️ **개선이 필요해요..** ({final_score}점)")
-        # st.balloons() # 축하 애니메이션 추가
+            st.warning(f"⚠️ **Needs Improvement..** ({final_score} pts)")
 
 
-# 저장된 답변 보기 버튼 로직
+# View Saved Responses Logic
 if view_button:
     with col2:
-        st.subheader("📋 저장된 답변 목록")
+        st.subheader("📋 Saved Responses")
         if st.session_state.responses:
             df_responses = pd.DataFrame(st.session_state.responses)
-            # 데이터프레임 스타일링
+            # Dataframe styling
             st.dataframe(
                 df_responses.style.highlight_max(
-                    axis=0, subset=["만족도 점수"], color="#d4edda"
+                    axis=0, subset=["Satisfaction Score"], color="#d4edda"
                 ),
                 use_container_width=True,
             )
         else:
             st.info(
-                "아직 저장된 응답이 없습니다. 첫 번째 응답을 보내주세요!"
+                "No responses saved yet. Please submit the first response!"
             )
